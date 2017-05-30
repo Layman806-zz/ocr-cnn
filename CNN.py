@@ -16,7 +16,7 @@ def ReLU(z): return T.maximum(0.0, z)
 
 ip_size = 784
 debug = True
-GPU = False
+GPU = True
 if GPU:
     print("Trying to run under a GPU.")
     try:
@@ -51,16 +51,17 @@ class Loader:
                 print('LOADING FOLDER: ' + str(c+1))
             for i in range(1016):
                 f_path = path + str(c+1) + '/' + str(i) + '.png'  # full path
-                im = cv2.imread(f_path, 0)  # opening image in gray scale mode
+                im = cv2.imread(f_path, cv2.IMREAD_GRAYSCALE)  # opening image in gray scale mode
                 im = cv2.resize(im, (28, 28))
                 # im2 = np.reshape(im, (ip_size, 1))  # reshaping to an array which can be fed to the neural network
                 im2 = np.asarray(im)
                 # im2 = im2.ravel()
-                # cells.append(np.reshape((np.array(pdata), (ip_size, 1)), int(number)))
                 # im2 = np.reshape(im2, (ip_size, 1))
+                # im2 = np.concatenate(im2)
                 print(im2.shape)
                 # im2 = np.reshape(im, (ip_size, 1))
                 result = vectorize(c)
+                result = np.concatenate(result)
                 print(result.shape)
                 if debug is True:
                     print('loaded ' + f_path)
@@ -74,14 +75,14 @@ class Loader:
                     testingInput.append(im2)
                     testingResult.append(result)
         training_data = (theano.shared(np.asarray(trainingInput, dtype=theano.config.floatX), borrow=True),
-                            T.cast(theano.shared(np.asarray(trainingResult, dtype=theano.config.floatX), borrow=True),
-                                   "int32"))
+                         T.cast(theano.shared(np.asarray(trainingResult, dtype=theano.config.floatX), borrow=True),
+                         "int32"))
         validation_data = (theano.shared(np.asarray(validationInput, dtype=theano.config.floatX), borrow=True),
-                              T.cast(theano.shared(np.asarray(validationResult, dtype=theano.config.floatX),
-                                                   borrow=True), "int32"))
+                           T.cast(theano.shared(np.asarray(validationResult, dtype=theano.config.floatX),
+                                  borrow=True), "int32"))
         testing_data = (theano.shared(np.asarray(testingInput, dtype=theano.config.floatX), borrow=True),
-                           T.cast(theano.shared(np.asarray(testingResult, dtype=theano.config.floatX), borrow=True),
-                                   "int32"))
+                        T.cast(theano.shared(np.asarray(testingResult, dtype=theano.config.floatX), borrow=True),
+                        "int32"))
         return training_data, validation_data, testing_data
 
 
