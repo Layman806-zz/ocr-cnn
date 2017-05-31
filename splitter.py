@@ -18,13 +18,14 @@ for i in range(62):
     for j in range(1016):
         f_path = c_path + '/' + str(j) + '.png'
 
-        im = Image.open(f_path)
+        if j <= 100 or (j>=916 and j<=926):
+            im = Image.open(f_path)
 
-        if j < 916:
+        if j <= 100:
             if not os.path.exists('Train/'+str(i)):
                 os.makedirs('Train/'+str(i))
             im.save('Train/'+str(i)+'/'+str(j)+'.png')
-        else:
+        elif j >= 916 and j <= 926:
             if not os.path.exists('Test/'+str(i)):
                 os.makedirs('Test/'+str(i))
             im.save('Test/'+str(i)+'/'+str(j)+'.png')
