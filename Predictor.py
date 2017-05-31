@@ -39,19 +39,48 @@ model.add(Activation('softmax'))
 
 opt = keras.optimizers.rmsprop(lr=0.0001, decay=1e-6)
 
-model.load_weights('second_try.h5')
+# loading saved model
+model.load_weights('third_try.h5')
+
+# loading saved classes list for model, by generating test data first
+test_datagen = ImageDataGenerator(rescale=1./255)
+
+batch_size = 16
+validation_generator = test_datagen.flow_from_directory(
+        'Test',
+        target_size=(64, 64),
+        batch_size=batch_size,
+        class_mode='categorical')
+prev = ''
+class_labels = []  # generate class_labels from filenames in test generator's data_flow
+for x in validation_generator.filenames:
+    i = 0
+    while x[i] != '/':
+        i = i + 1
+    s = x[:i]
+    if prev != s:
+        class_labels.append(s)
+        prev = s
+
+# print(class_labels)
+
 
 def predict(img):
     img = cv2.resize(img, (img_height, img_width))
     img = np.reshape(img, [1, img_height, img_width, 3])
     pr = model.predict(img)
     pr_i = np.argmax(pr)
+    actual_i = int(class_labels[pr_i])
+    pr_i = actual_i
     '''Code to return class name based on predicted index, pr_i'''
-    print(pr_i)
-    if pr_i <10:
+    # print(pr_i)
+    if pr_i < 10:
         return str(pr_i)
     else:
         return list(string.ascii_uppercase)[pr_i-10]
 
+'''
+# Usage example:
 im = cv2.imread('25.png')
 print(predict(im))
+'''
