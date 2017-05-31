@@ -7,11 +7,11 @@ import keras
 import h5py
 
 datagen = ImageDataGenerator(
-        rotation_range=20,
-        width_shift_range=0.2,
-        height_shift_range=0.2,
+        rotation_range=0,
+        width_shift_range=0.0,
+        height_shift_range=0.0,
         shear_range=0.2,
-        zoom_range=0.2,
+        zoom_range=0.0,
         horizontal_flip=False,
         fill_mode='nearest')
 
@@ -42,7 +42,7 @@ model.add(Flatten())  # this converts our 3D feature maps to 1D feature vectors
 model.add(Dense(64))
 model.add(Activation('relu'))
 model.add(Dropout(0.5))
-model.add(Dense(62))
+model.add(Dense(36))  # 36 classes. 0-9 and A-Z
 model.add(Activation('softmax'))
 
 opt = keras.optimizers.rmsprop(lr=0.0001, decay=1e-6)
@@ -53,27 +53,24 @@ model.compile(loss='categorical_crossentropy',
 
 batch_size = 16
 
-# this is the augmentation configuration we will use for training
+# augmentation configuration for training
 train_datagen = ImageDataGenerator(
         rescale=1./255,
         shear_range=0.2,
-        zoom_range=0.2,
+        zoom_range=0.0,
         horizontal_flip=True)
 
-# this is the augmentation configuration we will use for testing:
 # only rescaling
 test_datagen = ImageDataGenerator(rescale=1./255)
 
-# this is a generator that will read pictures found in
-# subfolders of 'data/train', and indefinitely generate
-# batches of augmented image data
+# generator reads from directory and assignes classes automatically
 train_generator = train_datagen.flow_from_directory(
         'Train',  # this is the target directory
         target_size=(64, 64),  # all images will be resized to 64x64
         batch_size=batch_size,
         class_mode='categorical')
 
-# this is a similar generator, for validation data
+# similar generator, for validation data
 validation_generator = test_datagen.flow_from_directory(
         'Test',
         target_size=(64, 64),
@@ -83,9 +80,12 @@ validation_generator = test_datagen.flow_from_directory(
 model.fit_generator(
         train_generator,
         steps_per_epoch=2000 // batch_size,
-        epochs=150,
+        epochs=50,
         validation_data=validation_generator,
         validation_steps=800 // batch_size)
-model.save_weights('first_try.h5')  # saving weights after training
+model.save_weights('third_try.h5')  # saving weights after training
 
 # pr = model.predict_classes(im.reshape((1, 1, 28, 28)))  # for predicting for a single image
+
+# print(train_generator.filenames)
+# print(validation_generator.filenames)
