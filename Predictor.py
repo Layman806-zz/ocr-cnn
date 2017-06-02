@@ -8,6 +8,7 @@ import keras
 import numpy as np
 import cv2
 import string
+import jsonio as jio
 
 img_width = 64
 img_height = 64
@@ -41,7 +42,7 @@ opt = keras.optimizers.rmsprop(lr=0.0001, decay=1e-6)
 
 # loading saved model
 model.load_weights('third_try.h5')
-
+'''
 # loading saved classes list for model, by generating test data first
 test_datagen = ImageDataGenerator(rescale=1./255)
 
@@ -51,17 +52,8 @@ validation_generator = test_datagen.flow_from_directory(
         target_size=(64, 64),
         batch_size=batch_size,
         class_mode='categorical')
-prev = ''
-class_labels = []  # generate class_labels from filenames in test generator's data_flow
-for x in validation_generator.filenames:
-    i = 0
-    while x[i] != '/':
-        i = i + 1
-    s = x[:i]
-    if prev != s:
-        class_labels.append(s)
-        prev = s
-
+'''
+class_labels = jio.get('classnames.txt')
 # print(class_labels)
 
 
@@ -79,8 +71,8 @@ def predict(img):
     else:
         return list(string.ascii_uppercase)[pr_i-10]
 
-'''
+
 # Usage example:
-im = cv2.imread('25.png')
+im = cv2.imread('13.png')
 print(predict(im))
-'''
+
