@@ -5,6 +5,7 @@ from keras.layers import Activation, Dropout, Flatten, Dense
 from keras import backend as K
 import keras
 import h5py
+import jsonio as jio
 
 datagen = ImageDataGenerator(
         rotation_range=0,
@@ -76,7 +77,7 @@ validation_generator = test_datagen.flow_from_directory(
         target_size=(64, 64),
         batch_size=batch_size,
         class_mode='categorical')
-
+'''
 model.fit_generator(
         train_generator,
         steps_per_epoch=2000 // batch_size,
@@ -84,7 +85,26 @@ model.fit_generator(
         validation_data=validation_generator,
         validation_steps=800 // batch_size)
 model.save_weights('third_try.h5')  # saving weights after training
+'''
+prev = ''
+class_labels = []  # generate class_labels from filenames in test generator's data_flow
+for x in validation_generator.filenames:
+    i = 0
+    while x[i] != '/':
+        i = i + 1
+    s = x[:i]
+    if prev != s:
+        class_labels.append(s)
+        prev = s
 
+jio.put(class_labels, 'classnames.txt')
+
+cl_names = jio.get('classnames.txt')
+print("Class names: "+str(cl_names))
+'''
+for i in cl_names:
+    print(i)
+'''
 # pr = model.predict_classes(im.reshape((1, 1, 28, 28)))  # for predicting for a single image
 
 # print(train_generator.filenames)
